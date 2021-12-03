@@ -1,11 +1,11 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from .node import Node
 
 class BaseTree(object):
     def __init__(self):
         self._root = None
         self._nodes = OrderedDict()
-        self._levels = 0
+        self._hierarchical_tree = {}
 
     def __contains__(self, node):
         # if a node is in this tree
@@ -40,12 +40,16 @@ class BaseTree(object):
                 raise Exception('root has already existed and parent cannot be none.')
             self._root = node
             self._nodes[node.identifier] = node
+
+            # /* set root and make its level as 0 */
             node.set_parent(None)
             return
         pid = parent.identifier if isinstance(parent, Node) else parent
         if not pid in self._nodes:
             raise Exception('parent not found in this tree.')
         self._nodes[node.identifier] = node
+
+        # /* link node with its parent */
         node.set_parent(self[pid])
         self[pid].add_child(node)
         return

@@ -1,6 +1,6 @@
 import numpy as np
 
-class Hap(object):
+class Haplotype(object):
     def __init__(self, ancestral_state=0):
         self.haplotype_matrix = None
         self.positions = None
