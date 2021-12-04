@@ -1,11 +1,12 @@
 from collections import OrderedDict, defaultdict
 from .node import Node
+import pptree
 
 class BaseTree(object):
     def __init__(self):
-        self._root = None
+        self.root = None
         self._nodes = OrderedDict()
-        self._hierarchical_tree = {}
+        # self._hierarchical_tree = {}
 
     def __contains__(self, node):
         # if a node is in this tree
@@ -36,9 +37,9 @@ class BaseTree(object):
         if node.identifier in self._nodes:
             raise Exception('cannot add the node that has already been in the tree.')
         if parent is None:
-            if self._root:
+            if self.root:
                 raise Exception('root has already existed and parent cannot be none.')
-            self._root = node
+            self.root = node
             self._nodes[node.identifier] = node
 
             # /* set root and make its level as 0 */
@@ -59,6 +60,19 @@ class BaseTree(object):
             return self._nodes
         return func(self._nodes)
 
+    def get_leaves(self):
+        leaves = []
+        for nid in self.get_all_nodes(func=list):
+            if self[nid].is_leaf():
 
+
+
+    def to_dict(self):
+        # return a dict for the whole tree.
+        root = self.root
+        pass
+
+    def format(self, output_format='newick'):
+        file_type = {'newick':0}
 
 

@@ -13,11 +13,13 @@ class Node(object):
         self.parent = {}
         self.branch = branch
         self.children = OrderedDict()
-        self.children_list = []
+        self._children = []  # using for printing tree
 
     def is_root(self):
-        return self.children
+        return self.level == 0
 
+    def is_leaf(self):
+        return len(self.children) == 0
 
     def add_child(self, node):
         if node in self.children:
@@ -25,14 +27,14 @@ class Node(object):
         if node in self.parent:
             raise Exception('parent cannot be added as a child.')
         self.children[node.identifier] = node
-        self.children_list.append(node)
+        self._children.append(node)
 
     def set_parent(self, parent):
         if parent is None:
             self.parent = {}
             self.level = 0
         else:
-            self.parent[parent.identifier] = parent
+            self.parent = {parent.identifier: parent}
             self.level = parent.level + 1
 
     @property
@@ -60,7 +62,7 @@ class Node(object):
     @property
     def branch(self):
         return self._branch
-    
+
     @branch.setter
     def branch(self, value):
         if self.parent is None:
@@ -72,7 +74,8 @@ class Node(object):
 
     def set_branch(self, value):
         self.branch = value
-    
+
+
 if __name__ == '__main__':
     node = Node()
     print(node.identifier, node.name)
