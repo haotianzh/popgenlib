@@ -1,13 +1,20 @@
 from collections import OrderedDict
 from uuid import uuid1
-from copy import deepcopy
 
 
 class Node(object):
-    def __init__(self, name=None, identifier=None, branch=0):
+    """
+    A node class, was implemented for constructing genealogical trees.
+    Arguments:
+        args:
+    >>> node = Node()
+    >>> node = Node(1) # or
+    >>> node = Node(identifier=1, name='ken', branch=10) # or
+    """
+    def __init__(self, identifier=None, name=None, branch=0):
         self.identifier = identifier
         if name is None:
-            self.name = self.identifier
+            self.name = str(self.identifier)
         else:
             self.name = name
         self.parent = {}
@@ -15,49 +22,15 @@ class Node(object):
         self.children = OrderedDict()
         self._children = []  # using for printing tree
 
-    def is_root(self):
-        return self.level == 0
-
-    def is_leaf(self):
-        return len(self.children) == 0
-
-    def add_child(self, node):
-        if node in self.children:
-            raise Exception('node has already been added.')
-        if node in self.parent:
-            raise Exception('parent cannot be added as a child.')
-        self.children[node.identifier] = node
-        self._children.append(node)
-
-    def set_parent(self, parent):
-        if parent is None:
-            self.parent = {}
-            self.level = 0
-        else:
-            self.parent = {parent.identifier: parent}
-            self.level = parent.level + 1
-
     @property
     def identifier(self):
         return self._identifier
 
     @identifier.setter
     def identifier(self, nid):
-        if nid is None:
+        if nid is None or nid is '':
             nid = str(uuid1())
         self._identifier = nid
-
-    @property
-    def level(self):
-        return self._level
-
-    @level.setter
-    def level(self, value):
-        if not isinstance(value, int):
-            raise Exception('value of level should be an integer.')
-        if value < 0:
-            raise Exception('value cannot be negative.')
-        self._level = value
 
     @property
     def branch(self):
@@ -72,10 +45,71 @@ class Node(object):
         else:
             raise Exception('branch must be a number.')
 
+    def is_root(self):
+        return self.get_level() == 0
+
+    def is_leaf(self):
+        return len(self.children) == 0
+
+    def get_ancestors(self):
+        parents = []
+        node = self.parent
+        while node:
+            parents.append(node)
+            node = node.parent
+        return parents
+
+    def get_descendants_dict(self):
+        # simple bfs for searching descendants
+        descendants = {}
+        queue = [self]
+        while queue:
+            node = queue.pop(0)
+            for child in node.get_children():
+                descendants.update({child.identifier: child})
+                queue.append(child)
+        return descendants
+
+    def get_descendants(self):
+        # simple bfs for searching descendants
+        descendants = []
+        queue = [self]
+        while queue:
+            node = queue.pop(0)
+            for child in node.get_children():
+                descendants.append(child)
+                queue.append(child)
+        return descendants
+
+    def add_child(self, node):
+        if node.identifier in [d.identifier for d in self.get_descendants()]:
+            raise Exception('node %s has already been added.' % node.identifier)
+        if node.identifier in [a.identifier for a in self.get_ancestors()]:
+            raise Exception('parent %s cannot be added as a child.' % node.identifier)
+        self.children[node.identifier] = node
+        self._children.append(node)
+
+    def get_children(self):
+        return self._children
+
+    def get_level(self):
+        level = 0
+        node = self.parent
+        while node:
+            node = node.parent
+            level += 1
+        return level
+
+    def set_parent(self, parent):
+        if parent is None:
+            self.parent = None
+        else:
+            self.parent = parent
+
     def set_branch(self, value):
         self.branch = value
 
 
 if __name__ == '__main__':
-    node = Node()
-    print(node.identifier, node.name)
+    node = Node('')
+    print(node.name, node.identifier)

@@ -2,11 +2,18 @@ from collections import OrderedDict, defaultdict
 from .node import Node
 import pptree
 
+
 class BaseTree(object):
+    """
+    A tree class, for extracting features from genealogical trees in the future.
+    Arguments:
+        args:
+    >>> tree = BaseTree();
+    >>> tree = popgen.utils.treeutils.from_newick('((1,2),(3,4));') # or
+    """
     def __init__(self):
         self.root = None
         self._nodes = OrderedDict()
-        # self._hierarchical_tree = {}
 
     def __contains__(self, node):
         # if a node is in this tree
@@ -16,8 +23,8 @@ class BaseTree(object):
             return True
         else:
             return False
-    
-    def __getitem__(self, identifier):
+
+    def __getitem__(self, identifier) -> Node:
         # get a node from node list
         return self._nodes[identifier]
 
@@ -25,13 +32,10 @@ class BaseTree(object):
         # obtain number of nodes in a tree
         return len(self._nodes)
 
-    def from_newick(self, newick):
-        # construct a tree from newick format string
-        pass
-
-    def create_node(self, name=None, identifier=None, parent=None):
-        node = Node(name=name, identifier=identifier)
+    def create_node(self, identifier=None, name=None, parent=None) -> Node:
+        node = Node(identifier=identifier, name=name)
         self.add_node(node, parent)
+        return node
 
     def add_node(self, node, parent=None):
         if node.identifier in self._nodes:
@@ -41,7 +45,6 @@ class BaseTree(object):
                 raise Exception('root has already existed and parent cannot be none.')
             self.root = node
             self._nodes[node.identifier] = node
-
             # /* set root and make its level as 0 */
             node.set_parent(None)
             return
@@ -49,30 +52,41 @@ class BaseTree(object):
         if not pid in self._nodes:
             raise Exception('parent not found in this tree.')
         self._nodes[node.identifier] = node
-
         # /* link node with its parent */
         node.set_parent(self[pid])
         self[pid].add_child(node)
         return
 
-    def get_all_nodes(self, func=None):
-        if func is None:
-            return self._nodes
-        return func(self._nodes)
+    def get_all_nodes(self):
+        return self._nodes
 
     def get_leaves(self):
         leaves = []
-        for nid in self.get_all_nodes(func=list):
+        for nid in self.get_all_nodes():
             if self[nid].is_leaf():
-
-
+                leaves.append(nid)
+        return leaves
 
     def to_dict(self):
         # return a dict for the whole tree.
-        root = self.root
         pass
 
-    def format(self, output_format='newick'):
-        file_type = {'newick':0}
+    def output(self, output_format='newick', branch_lengths=False):
+        def _newick(node, branch_lengths):
+            if node.is_leaf():
+                return node.name
+            fstr = '(' + ','.join(['{newick}:{branch}'
+                                  .format(newick=_newick(child, branch_lengths), branch=child.branch)
+                                   if branch_lengths else _newick(child, branch_lengths)
+                                   for child in node.get_children()]) + ')'
+            return fstr
 
+        def newick():
+            return _newick(self.root, branch_lengths) + ';'
+
+        funcs = {'newick': newick}
+        return funcs[output_format]()
+
+    def print(self):
+        pptree.print_tree(self.root, "_children", horizontal=False)
 
