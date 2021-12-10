@@ -1,24 +1,21 @@
-from popgen.base import BaseTree, Node
-import pptree
 from time import time
-import numpy as np
-from popgen.utils.treeutils import TraversalGenerator
-from popgen.utils import from_newick
-import msprime as msp
 from popgen.utils.simulator import Simulator
-
+from popgen.utils.treeutils import TraversalGenerator
+from popgen.utils.statistics import ld_matrix, ld_cluster
 start = time()
 
 configs = {
     'sequence_length': 1e5,
     'population_size': 1e5,
-    'rate': [1e-9, 1e-7]
+    'rate': 1e-9
 }
 simulator = Simulator()
 simulator.set_configs(configs)
-print(simulator.configs)
-for sample in simulator(50, 5):
-    print(sample.configs,'|', sample)
+for sample in simulator(100, 1):
+    ld = ld_matrix(sample.haplotype)
+    cl = ld_cluster(ld)
+    print(ld.shape, cl.shape)
+import numpy as np
 
 
 end = time()

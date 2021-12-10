@@ -3,7 +3,11 @@ import os
 from ..base import Sample
 
 
-def compute_ld_matrix(haplotype):
+def pairwise_ld(haplotype):
+    """ Compute pairwise r^2 of LD.
+    Input: a Haplotype object
+    Return: a 2d numpy array
+    """
     matrix = haplotype.matrix
     rows, cols = matrix.shape
     freq_vec_1 = np.sum(matrix, axis=0) / rows
@@ -14,11 +18,16 @@ def compute_ld_matrix(haplotype):
     p1q1 = np.dot(freq_vec_1, freq_vec_1.T)
     p0q0 = np.dot(freq_vec_0, freq_vec_0.T)
     ld = product - p1q1
-    ld = ld ** 2 / (p1q1 * p0q0)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        ld = np.nan_to_num(ld ** 2 / (p1q1 * p0q0))
     return ld
 
 
-def cluster(matrix):
+def cluster_ld(matrix):
+    """ Clustering based on precomputed pairwise LD matrix.
+    Input: pairwise LD matrix (numpy.array)
+    Return: clustering matrix (numpy.array)
+    """
     mat = matrix.copy()
     i = 0
     rows = matrix.shape[0]
@@ -35,7 +44,7 @@ def cluster(matrix):
     return mat
 
 
-def compute_rh(data):
+def rh(data):
     rows, cols = data.shape
     remain = set()
     rh = 0
@@ -45,3 +54,8 @@ def compute_rh(data):
             rh += 1
     rh = rh - cols
     return rh
+
+
+def pairwise_rf_distance():
+    """ Compute pairwise Robinson-Foulds distance. """
+    pass
