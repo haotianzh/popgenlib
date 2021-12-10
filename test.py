@@ -11,13 +11,14 @@ start = time()
 
 configs = {
     'sequence_length': 1e5,
-    'population_size': 1e5
+    'population_size': 1e5,
+    'rate': [1e-9, 1e-7]
 }
 simulator = Simulator()
 simulator.set_configs(configs)
+print(simulator.configs)
 for sample in simulator(50, 5):
-    simulator.update({'rate': np.random.rand() * 1e-9})
-    print(sample.configs['rate'],'|', sample)
+    print(sample.configs,'|', sample)
 
 
 end = time()
