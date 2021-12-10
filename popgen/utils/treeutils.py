@@ -5,7 +5,7 @@ description: utils for trees
 """
 from ..base import BaseTree, Node
 import warnings
-
+import time
 
 class TraversalGenerator(object):
     """
@@ -133,6 +133,7 @@ def from_newick(newick: str) -> BaseTree:
         node = Node(identifier=identifier, branch=branch)
         nodes.append((node, level))
         i = end
+
     root = nodes.pop()
     tree = from_node(root[0])
     return tree

@@ -1,6 +1,7 @@
 from collections import OrderedDict
-from uuid import uuid1
-
+import os
+import binascii
+import time
 
 class Node(object):
     """
@@ -29,7 +30,7 @@ class Node(object):
     @identifier.setter
     def identifier(self, nid):
         if nid is None or nid is '':
-            nid = str(uuid1())
+            nid = str(binascii.hexlify(os.urandom(5)).decode('utf-8'))
         self._identifier = nid
 
     @property
@@ -82,6 +83,10 @@ class Node(object):
         return descendants
 
     def add_child(self, node):
+        """
+        Adding child to a specific node. Potentially running slow due to inner traversal for ensuring no conflicts
+        happened. (should be optimized in the future)
+        """
         if node.identifier in [d.identifier for d in self.get_descendants()]:
             raise Exception('node %s has already been added.' % node.identifier)
         if node.identifier in [a.identifier for a in self.get_ancestors()]:
@@ -111,5 +116,12 @@ class Node(object):
 
 
 if __name__ == '__main__':
-    node = Node('')
-    print(node.name, node.identifier)
+    st = time.time()
+    pre = Node()
+    for i in range(10000):
+        node = Node()
+        pre.add_child(node)
+        node.set_parent(pre)
+        pre = node
+
+    print(time.time()- st)

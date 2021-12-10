@@ -1,22 +1,31 @@
 import numpy as np
+import tskit
 
 class Haplotype(object):
-    def __init__(self, ancestral_state=0):
-        self.haplotype_matrix = None
-        self.positions = None
+    """
+    Class for haplotype
+    """
+    def __init__(self, ts, ancestral_state=0):
+        assert isinstance(ts, tskit.TreeSequence), Exception("a msprime.TreeSequence object must be provided.")
+        self.matrix = ts.genotype_matrix().T
+        self.positions = [v.position for v in ts.variants()]
         self.ancestral_state = ancestral_state
 
+    def cut(self):
+        # using tskit.TreeSequence.keep_intervals() to cut genome into fixed-length fragments.
+        pass
+
     @property
-    def num_sites(self):
-        if not self.haplotype_matrix:
-            return self.haplotype_matrix.shape[0]
+    def nsites(self):
+        if self.matrix is not None:
+            return self.matrix.shape[1]
         else:
             return 0
 
     @property
-    def num_samples(self):
-        if not self.haplotype_matrix:
-            return self.haplotype_matrix.shape[1]
+    def nsamples(self):
+        if self.matrix is not None:
+            return self.matrix.shape[0]
         else:
             return 0
 
