@@ -1,4 +1,4 @@
-from ..base import Haplotype, Sample
+from ..base import Replicate
 import msprime as msp
 import numpy as np
 import warnings
@@ -35,11 +35,13 @@ class Simulator(object):
         ploidy: haploid or diploid
     """
 
-    def __init__(self):
+    def __init__(self, configs=None):
         self.__simulator__ = '{name}/{version}'.format(name='msprime', version=msp.__version__)
         self.configs = None
         self._mutation_configs = None
         self._ancestry_configs = None
+        if configs is not None:
+            self.set_configs(configs)
 
     def __call__(self, nsam, nreps):
         """ Run simulation for nsam samples and nreps replicates """
@@ -52,8 +54,8 @@ class Simulator(object):
             configs = {'rate': self._mutation_configs['rate']()}
             mts = msp.sim_mutations(ts, **configs)
             configs.update(self._ancestry_configs)
-            sample = Sample(mts, configs)
-            yield sample
+            rep = Replicate(mts, configs)
+            yield rep
 
     def update(self, u):
         assert isinstance(u, dict), Exception('key-value pairs must be provided.')

@@ -7,6 +7,7 @@ from ..base import BaseTree, Node
 import warnings
 import time
 
+
 class TraversalGenerator(object):
     """
     A generator class used for tree traversal
@@ -66,6 +67,7 @@ class TraversalGenerator(object):
         else:
             raise Exception("order should be in ['pre', 'mid', 'post']")
 
+
 def from_node(node: Node) -> BaseTree:
     """ Build a tree by directly setting a root """
     tree = BaseTree()
@@ -76,6 +78,7 @@ def from_node(node: Node) -> BaseTree:
 
 def from_newick(newick: str) -> BaseTree:
     """ Build a tree according to a newick-format string """
+
     def _isvalid(s):
         checking_stack = []
         for ch in s:
@@ -100,6 +103,7 @@ def from_newick(newick: str) -> BaseTree:
         else:
             nid = newick[i:j]
         return nid.strip(), float(br), j
+
     newick = newick.strip()
     assert isinstance(newick, str), Exception('newick should be a string.')
     assert _isvalid(newick), Exception('invalid newick string.')
@@ -137,5 +141,3 @@ def from_newick(newick: str) -> BaseTree:
     root = nodes.pop()
     tree = from_node(root[0])
     return tree
-
-

@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from ..base import Sample
+from ..base import Replicate
 
 
 def pairwise_ld(haplotype):
@@ -44,18 +44,15 @@ def cluster_ld(matrix):
     return mat
 
 
-def rh(data):
-    rows, cols = data.shape
-    remain = set()
-    rh = 0
-    for i in range(rows):
-        if str(data[i, :]) not in remain:
-            remain.add(str(data[i, :]))
-            rh += 1
-    rh = rh - cols
-    return rh
+# def rh(data):
+#     rows, cols = data.shape
+#     remain = set()
+#     rh = 0
+#     for i in range(rows):
+#         if str(data[i, :]) not in remain:
+#             remain.add(str(data[i, :]))
+#             rh += 1
+#     rh = rh - cols
+#     return rh
 
 
-def pairwise_rf_distance():
-    """ Compute pairwise Robinson-Foulds distance. """
-    pass

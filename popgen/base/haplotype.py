@@ -5,10 +5,14 @@ class Haplotype(object):
     """
     Class for haplotype
     """
-    def __init__(self, ts, ancestral_state=0):
-        assert isinstance(ts, tskit.TreeSequence), Exception("a msprime.TreeSequence object must be provided.")
-        self.matrix = ts.genotype_matrix().T
-        self.positions = [v.position for v in ts.variants()]
+    def __init__(self, ts=None, positions=None, matrix=None, ancestral_state=0):
+        if ts is not None:
+            assert isinstance(ts, tskit.TreeSequence), Exception("a tskit.TreeSequence object must be provided.")
+            self.matrix = ts.genotype_matrix().T
+            self.positions = [int(v.position) for v in ts.variants()]
+        elif matrix is not None and positions is not None:
+            self.matrix = matrix
+            self.positions = positions
         self.ancestral_state = ancestral_state
 
     def cut(self):
