@@ -1,6 +1,9 @@
-import numpy as np
-import os
 from ..base import Replicate
+import os
+import numpy as np
+import scipy
+from scipy import stats
+
 
 
 def pairwise_ld(haplotype):
@@ -56,3 +59,23 @@ def cluster_ld(matrix):
 #     return rh
 
 
+def stat(rates, pos, sequence_length, ne=1e5, window_size=50, step_size=50, bin_width=1e4):
+    snpsites = len(pos)
+    rates = rates.reshape(-1)
+    centers = []
+    lens = []
+    bounds = []
+    for i in range(len(rates)):
+        # take central point in each interval
+        centers.append(pos[int(i*window_size+ step_size/2)])
+        bounds.append((pos[i*window_size], pos[min(i*window_size+step_size, len(pos)-1)]))
+        if i*window_size + step_size >= snpsites:
+            last = len(rates)-1
+        else:
+            last = i*window_size + step_size
+        lens.append(pos[last] - pos[i*window_size])
+    lens = np.array(lens)
+    print(lens)
+    scaledY = rates / lens / 4 / ne
+    v, bin_edges, _ = scipy.stats.binned_statistic(centers, scaledY, bins=sequence_length//bin_width) # range=(0,chrLength)
+    return (scaledY, bounds, [bin_edges[:-1], v])

@@ -1,11 +1,12 @@
+from ..base import BaseTree, Node
+import warnings
+import time
+
 """
 author: Haotian
 created_at: 12/4/2021
 description: utils for trees
 """
-from ..base import BaseTree, Node
-import warnings
-import time
 
 
 class TraversalGenerator(object):

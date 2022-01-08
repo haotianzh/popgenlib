@@ -1,10 +1,11 @@
+from ..base import Haplotype
 import numpy as np
 import jpype
 import jpype.imports
 from jpype.types import *
 from labwu.rentplus.main import MPRentPlus
 from labwu.py import RFDistance
-from ..base import Haplotype
+
 
 
 def rentplus(haps, num_thread=5, infer_branch=False):

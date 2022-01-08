@@ -52,7 +52,7 @@ class Simulator(object):
         # simulate mutations once for each of genealogical trees.
         for ts in replicates:
             configs = {'rate': self._mutation_configs['rate']()}
-            mts = msp.sim_mutations(ts, **configs)
+            mts = msp.sim_mutations(ts, model=msp.InfiniteSites() ,**configs)
             configs.update(self._ancestry_configs)
             rep = Replicate(mts, configs)
             yield rep
