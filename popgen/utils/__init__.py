@@ -10,4 +10,4 @@ jpype.startJVM(classpath=[os.path.join(package_dirname, 'libs/*')])
 from java.lang import System
 from java.io import PrintStream, File
 original = System.out
-System.setOut(PrintStream(File("NUL")))
+# System.setOut(PrintStream(File("NUL")))

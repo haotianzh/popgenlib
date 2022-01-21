@@ -7,17 +7,16 @@ from labwu.rentplus.main import MPRentPlus
 from labwu.py import RFDistance
 
 
-
-def rentplus(haps, num_thread=5, infer_branch=False):
+def rentplus(haps, num_thread=1, infer_branch=False):
     matrices = []
     positions = []
     if isinstance(haps, Haplotype):
         matrices.append(haps.matrix)
-        positions.append(haps.positions)
+        positions.append(haps.scaled_positions)
     elif isinstance(haps, list):
         for hap in haps:
             matrices.append(hap.matrix)
-            positions.append(hap.positions)
+            positions.append(hap.scaled_positions)
     matrices = np.array(matrices, np.int)
     positions = np.array(positions, np.int)
     matrices_java = JArray.of(matrices)
