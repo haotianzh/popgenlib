@@ -30,7 +30,6 @@ def sliding_windows(hap, window_size, step_size=None):
         window_pos = np.array(positions[i:i + window_size])
         length = window_pos[-1] - window_pos[0]
         scaled_positions = ((window_pos - window_pos[0]) / length * 1e5 + 1).astype(np.int)
-        # print(scaled_positions)
         window_hap = Haplotype(matrix=window_mat, positions=scaled_positions.tolist())
         windows.append(window_hap)
     return windows

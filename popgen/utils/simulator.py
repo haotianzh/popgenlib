@@ -52,7 +52,7 @@ class Simulator(object):
         # simulate mutations once for each of genealogical trees.
         for ts in replicates:
             configs = {'rate': self._mutation_configs['rate']()}
-            mts = msp.sim_mutations(ts, model=msp.InfiniteSites() ,**configs)
+            mts = msp.sim_mutations(ts, model=msp.InfiniteSites(), **configs)
             configs.update(self._ancestry_configs)
             rep = Replicate(mts, configs)
             yield rep
@@ -71,9 +71,11 @@ class Simulator(object):
             if key not in configs:
                 raise Exception("%s must be set." % key)
         if 'rate' in configs:
-            assert isinstance(configs['rate'], float) or isinstance(configs['rate'], list), \
+            assert isinstance(configs['rate'], float) or isinstance(configs['rate'], list) or isinstance(configs['rate'], ExpLogGenerator), \
                 Exception("mutation rate should be either a float number or an interval.")
-            if isinstance(configs['rate'], float):
+            if isinstance(configs['rate'], ExpLogGenerator):
+                pass
+            elif isinstance(configs['rate'], float):
                 self._mutation_configs = {'rate': ExpLogGenerator(configs['rate'], configs['rate'])}
             else:
                 assert len(configs['rate']) == 2, Exception("length of list must be exactly 2.")
@@ -82,11 +84,11 @@ class Simulator(object):
             self._mutation_configs = {'rate': ExpLogGenerator(1e-8, 1e-8)}
         if 'population_size' in configs and 'demography' in configs:
             warnings.warn("both population size and demography detected, population size will be removed.")
-            del (configs['population_size'])
+            del(configs['population_size'])
         self._ancestry_configs = {'recombination_rate': 1e-8, 'ploidy': 1}
         self._ancestry_configs.update(configs)
         if 'rate' in self._ancestry_configs:
-            del (self._ancestry_configs['rate'])
+            del(self._ancestry_configs['rate'])
         if self.configs is None:
             self.configs = dict()
         self.configs.update(self._mutation_configs)

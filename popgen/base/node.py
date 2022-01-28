@@ -97,6 +97,13 @@ class Node(object):
     def get_children(self):
         return self._children
 
+    def get_leaves(self):
+        leaves = []
+        for node in self.get_descendants():
+            if node.is_leaf():
+                leaves.append(node)
+        return leaves
+
     def get_level(self):
         level = 0
         node = self.parent

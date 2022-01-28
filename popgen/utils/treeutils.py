@@ -79,7 +79,6 @@ def from_node(node: Node) -> BaseTree:
 
 def from_newick(newick: str) -> BaseTree:
     """ Build a tree according to a newick-format string """
-
     def _isvalid(s):
         checking_stack = []
         for ch in s:

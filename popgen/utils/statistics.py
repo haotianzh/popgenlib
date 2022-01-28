@@ -75,7 +75,6 @@ def stat(rates, pos, sequence_length, ne=1e5, window_size=50, step_size=50, bin_
             last = i*window_size + step_size
         lens.append(pos[last] - pos[i*window_size])
     lens = np.array(lens)
-    print(lens)
     scaledY = rates / lens / 2 / ploidy / ne
     v, bin_edges, _ = scipy.stats.binned_statistic(centers, scaledY, bins=sequence_length//bin_width) # range=(0,chrLength)
-    return (scaledY, bounds, [bin_edges[:-1], v])
+    return scaledY, bounds, [bin_edges[:-1], v]
