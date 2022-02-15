@@ -70,10 +70,10 @@ class BaseTree(object):
         return leaves
 
     def get_splits(self):
-        splits = []
+        splits = set()
         for nid in self.get_all_nodes():
             if not self._nodes[nid].is_leaf() and not self._nodes[nid].is_root():
-                splits.append(set([node.identifier for node in self._nodes[nid].get_leaves()]))
+                splits.add(frozenset([node.identifier for node in self._nodes[nid].get_leaves()]))
         return splits
 
     def to_dict(self):

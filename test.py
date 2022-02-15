@@ -6,6 +6,7 @@ from popgen.utils.treeutils import TraversalGenerator
 from popgen.utils.statistics import cluster_ld, pairwise_ld, stat
 from popgen.utils.javautils import rentplus, rfdist
 from popgen.utils.utils import sliding_windows
+
 # from popgen.nn.predict import predict_keras
 
 start = time()
@@ -59,25 +60,46 @@ start = time()
 # predict(windows1)
 # predict(windows2)
 #
+import popgen
 import pandas as pd
 
-tree = popgen.utils.treeutils.from_newick('(((((((((((17,8),20),5),3),13),((19,2),6)),((11,14),12)),18),16),15),((((10,4),9),7),1));')
-splits = tree.get_splits()
-sorted_splits = sorted(splits, key=lambda x: len(x))
-data = {}
-for split in sorted_splits:
-    data[str(split)] = []
-    for leaf in tree.get_leaves():
-        data[str(split)].append(int(leaf in split))
-df = pd.DataFrame(data, index=tree.get_leaves())
-print(df)
 
+def do_once(tree):
+    tree = popgen.utils.treeutils.from_newick(tree)
+    splits = tree.get_splits()
+    sorted_splits = sorted(splits, key=lambda x: len(x))
+    data = {}
+    for split in sorted_splits:
+        data[split] = []
+        for leaf in tree.get_leaves():
+            data[split].append(int(leaf in split))
+    df = pd.DataFrame(data, index=tree.get_leaves())
+    return sorted_splits
+
+trees = '''(((((((((17,8),20),5),((11,14),6)),(((4,9),13),7)),(((10,12),2),(16,19))),1),(18,3)),15)
+((((((((((17,8),20),5),((11,14),6)),(((4,9),13),7)),((16,19),1)),((10,12),2)),3),18),15)
+((((((((((17,8),20),5),((11,14),6)),(((4,9),13),7)),(18,3)),2),((10,12),(16,19))),1),15)
+(((((((((((17,8),20),5),(((4,9),13),7)),(((11,14),6),3)),18),2),(16,19)),(10,12)),1),15)
+((((((((((17,8),20),5),(((4,9),13),7)),(((11,14),6),3)),18),2),((10,12),(16,19))),1),15)
+((((((((((17,8),20),5),(((4,9),7),13)),18),(((11,14),6),3)),2),((10,12),(16,19))),1),15)
+((((((((((10,12),(19,2)),((11,14),6)),3),1),(((17,8),20),5)),(16,18)),((4,9),13)),7),15)
+(((((((((((12,19),10),2),((11,14),6)),3),1),(((17,8),20),5)),(16,18)),((4,9),13)),7),15)
+((((((((((19,2),6),3),(11,14)),((10,12),1)),(((17,8),20),5)),(((4,9),13),18)),16),7),15)
+(((((((((((17,8),20),5),3),13),((19,2),6)),((11,14),12)),18),16),15),((((10,4),9),7),1))
+((((((((((17,8),20),5),(13,3)),(19,2)),((11,14),(12,6))),18),16),((((10,4),9),7),1)),15)
+(((((((((17,8),20),5),(13,3)),(19,2)),11),(((((12,14),6),16),15),1)),7),((10,4),(18,9)))
+(((((((((19,2),6),15),7),5),(((12,14),11),1)),(((17,8),20),(13,3))),16),((10,4),(18,9)))
+(((((((15,6),(19,2)),7),5),((((17,8),20),13),3)),((((11,14),12),1),16)),((10,4),(18,9)))
+(((((((((19,2),6),15),7),5),((((17,8),20),13),(11,3))),(((12,14),1),16)),(18,9)),(10,4))'''
+trees = [tree+';' for tree in trees.split('\n')]
+print(trees)
+all_splits = []
+
+for tree in trees:
+    split = do_once(tree)
+    all_splits.append(split)
 
 #
 # print((rep.haplotype.matrix == 2).sum())
 #
 # print("running time %f" % (end - start))
-
-
-
-
