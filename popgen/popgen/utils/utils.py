@@ -43,7 +43,10 @@ def filter_replicate(replicate):
     for site in ts.variants():
         if 0 not in site.genotypes or 1 not in site.genotypes:
             sites_for_delete.append(site.site.id)
-    filtered_replicate = Replicate(ts.delete_sites(sites_for_delete), replicate.configs)
+    treeseq = ts.delete_sites(sites_for_delete)
+    treeseq.__setattr__('rr', replicate.configs['recombination_rate'])
+    treeseq.__setattr__('mr', replicate.configs['rate'])
+    filtered_replicate = Replicate(treeseq, replicate.configs)
     return filtered_replicate
 
 
@@ -61,6 +64,8 @@ def cut_replicate(replicate, window_size=50):
     replicates = []
     for i in range(1, len(indices)):
         ts_fragment = ts.keep_intervals([[indices[i - 1], indices[i]]])
+        ts_fragment.__setattr__('rr', replicate.configs['recombination_rate'])
+        ts_fragment.__setattr__('mr', replicate.configs['rate'])
         rep_fragment = Replicate(ts_fragment, replicate.configs)
         replicates.append(rep_fragment)
 

@@ -50,9 +50,10 @@ class GenDataSet(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         newicks = self.genealogies[idx]
         rate = self.rates[idx]
-        print(newicks)
+        # print(newicks)
+        distance = self.haplotypes[idx].positions[-1] - self.haplotypes[idx].positions[0]
         t1, t2 = self.transform(newicks)
-        return t1, t2, rate
+        return t1, t2, rate, distance
 
 
 def transform(newicks):
@@ -76,30 +77,36 @@ def transform(newicks):
 
 
 def train():
+    training_history = []
+
     def validate(model, testdata):
         predicted_rates = []
         truth = []
         for d in testdata:
-            splits, maps, rate = d
+            splits, maps, rate, distance = d
             splits, maps, rate = splits.to(device), maps.to(device), torch.tensor(rate).to(device)
             with torch.no_grad():
                 output = model(splits, maps)
-            psr = output.item() / configs['population_size'] / 2 / configs['ploidy']
+            psr = output.item() / configs['population_size'] / 2 / configs['ploidy'] / distance
             predicted_rates.append(psr)
             truth.append(rate)
         mae = mean_absolute_error(truth, predicted_rates)
+        training_history.append(mae)
         print(f'truth: {mae}')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     data = []
     # create a simulator and cut them into small pieces
+    # !!!!!!!!!!!!!!!  have issues here
     simulator = Simulator()
     simulator.set_configs(configs)
-    for replicate in simulator(n_sam, n_rep):
+    for i in range(n_rep):
         simulator.update({'recombination_rate': np.random.rand() * 1e-7})
-        rep = popgen.utils.filter_replicate(replicate)
-        pieces = popgen.utils.cut_replicate(rep, window_size=window_size)
-        data.extend([(val.haplotype, val.configs['recombination_rate']) for val in pieces])
+        for replicate in simulator(n_sam, 1):
+            rep = popgen.utils.filter_replicate(replicate)
+            print(rep.ts.rr, rep.ts.mr)
+            pieces = popgen.utils.cut_replicate(rep, window_size=window_size)
+            data.extend([(val.haplotype, val.configs['recombination_rate']) for val in pieces])
     train_ratio = 0.8
     train_set = data[:int(len(data)*train_ratio)]
     test_set = data[int(len(data)*train_ratio):]
@@ -107,25 +114,29 @@ def train():
     dataset = GenDataSet(train_set, transform=transform)
     dataset_test = GenDataSet(test_set, transform=transform)
     model = SplitNet(num_nodes=n_sam)
+    print(f'training model: {model}')
     model.to(device=device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     # train the model
-    epochs = 10
+    epochs = 20
     loss_fn = torch.nn.MSELoss()
     for e in range(epochs):
         for i, d in enumerate(dataset):
-            splits, maps, rate = d
+
+            splits, maps, rate, distance = d
             splits, maps, rate = splits.to(device), maps.to(device), torch.tensor(rate).to(device)
             # print('split', splits.shape, 'maps', maps.shape)
-            psr = rate * configs['population_size'] * 2 * configs['ploidy']
+            psr = rate * configs['population_size'] * 2 * configs['ploidy'] * distance
             # print('psr', psr)
             optimizer.zero_grad()
             output = model(splits, maps)
-            loss = torch.abs(output-rate)
+            loss = torch.abs(output - psr)
             loss.backward()
             optimizer.step()
-            print(loss.item())
+            print(f'training loss: {loss.item()}')
         validate(model, dataset_test)
+    return training_history
 
 if __name__ == '__main__':
-    train()
+    history = train()
+    print(history)

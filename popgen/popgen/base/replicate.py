@@ -26,11 +26,9 @@ class Replicate(object):
         for variant in self.ts.variants():
             pos = variant.position
             for i in range(len(breakpoints)):
-                if breakpoints[i] < pos <= breakpoints[i+1]:
+                if breakpoints[i] < pos <= breakpoints[i + 1]:
                     alls.append(trees[i])
         return alls
-
-
 
     def __str__(self):
         return "%d samples, %d sites, %d topologies" % \

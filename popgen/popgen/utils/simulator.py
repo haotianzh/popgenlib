@@ -54,6 +54,8 @@ class Simulator(object):
             configs = {'rate': self._mutation_configs['rate']()}
             mts = msp.sim_mutations(ts, model=msp.InfiniteSites(), **configs)
             configs.update(self._ancestry_configs)
+            mts.__setattr__('rr', configs['recombination_rate'])
+            mts.__setattr__('mr', configs['rate'])
             rep = Replicate(mts, configs)
             yield rep
 
