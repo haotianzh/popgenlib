@@ -19,8 +19,8 @@ def rentplus(haps, num_thread=1, infer_branch=False):
             positions.append(hap.scaled_positions)
     matrices = np.array(matrices, np.int)
     positions = np.array(positions, np.int)
-    matrices_java = JArray.of(matrices)
-    positions_java = JArray.of(positions)
+    matrices_java = JInt[:][:][:](matrices)
+    positions_java = JInt[:][:](positions)
     rent_res = MPRentPlus.pythonMultiProcess(matrices_java, positions_java, num_thread, infer_branch)
     if isinstance(haps, Haplotype):
         return rent_res[0]
