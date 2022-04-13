@@ -1,4 +1,4 @@
-from ..base import Replicate
+from ..base import Replicate, Haplotype
 import os
 import numpy as np
 import scipy
@@ -8,10 +8,15 @@ from scipy import stats
 
 def pairwise_ld(haplotype):
     """ Compute pairwise r^2 of LD.
-    Input: a Haplotype object
+    Input: a Haplotype object or a numpy ndarray
     Return: a 2d numpy array
     """
-    matrix = haplotype.matrix
+    if isinstance(haplotype, Haplotype):
+        matrix = haplotype.matrix
+    elif isinstance(haplotype, np.ndarray):
+        matrix = haplotype
+    else:
+        Exception('Input should be an instance of either Haplotype or numpy.ndarray')
     rows, cols = matrix.shape
     freq_vec_1 = np.sum(matrix, axis=0) / rows
     freq_vec_0 = 1 - freq_vec_1
