@@ -61,6 +61,7 @@ cls = np.array(cls)[..., np.newaxis]
 rfs = np.array(rfdistance)[..., np.newaxis]
 data = np.concatenate([lds,cls,rfs], axis=-1).astype(np.float16)
 rhos = np.array(rhos)
+# save data
 np.save('train_data', data)
 np.save('train_label', rhos)
 
