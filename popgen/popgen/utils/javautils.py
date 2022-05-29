@@ -5,7 +5,7 @@ import jpype.imports
 from jpype.types import *
 from labwu.rentplus.main import MPRentPlus
 from labwu.py import RFDistance
-
+from labwu.py import TripletDistance
 
 def rentplus(haps, num_thread=1, infer_branch=False):
     matrices = []
@@ -29,4 +29,8 @@ def rentplus(haps, num_thread=1, infer_branch=False):
 
 def rfdist(newicks, num_thread=10):
     dist = RFDistance.rfDistance(newicks, num_thread)
+    return dist
+
+def triplet_dist(newicks, num_thread=10):
+    dist = TripletDistance.tripletDistance(newicks, num_thread)
     return dist

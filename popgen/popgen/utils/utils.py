@@ -51,7 +51,7 @@ def filter_replicate(replicate):
 
 
 # for class Replicate
-def cut_replicate(replicate, window_size=50):
+def cut_replicate(replicate, window_size=50, drop_last=True):
     ts = replicate.ts
     assert ts is not None, Exception("ts shouldn't be none.")
     indices = [0]
@@ -68,7 +68,15 @@ def cut_replicate(replicate, window_size=50):
         ts_fragment.__setattr__('mr', replicate.configs['rate'])
         rep_fragment = Replicate(ts_fragment, replicate.configs)
         replicates.append(rep_fragment)
-
+    if not drop_last:
+        if count == 0:
+            ts_last = None
+        else:
+            ts_last = ts.keep_intervals([[indices[-1], indices[-1]+count-1]])
+            ts_last.__setattr__('rr', replicate.configs['recombination_rate'])
+            ts_last.__setattr__('mr', replicate.configs['rate'])
+            rep_last = Replicate(ts_last, replicate.configs)
+        return replicates, ts_last
     return replicates
 
 

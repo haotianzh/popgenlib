@@ -5,11 +5,11 @@ from popgen.utils.statistics import pairwise_ld, cluster_ld
 configs = {
     'sequence_length': 5e5,
     'population_size': 1e5,
-    'rate': 1e-8,
+    'rate': 2.5e-8,
     'recombination_rate': 3.9e-8,
     'ploidy': 1
 }
-n_sams = 5 # for test only
+n_sams = 500 # 5 for test only
 n_pop = 100
 n_per_draw = 5
 global_window_size = 1000
