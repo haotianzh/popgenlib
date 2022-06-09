@@ -27,10 +27,11 @@ def sliding_windows(hap, window_size, step_size=None):
         if i + window_size > hap.nsites:
             break
         window_mat = matrix[:, i:i + window_size]
-        window_pos = np.array(positions[i:i + window_size])
-        length = window_pos[-1] - window_pos[0]
-        scaled_positions = ((window_pos - window_pos[0]) / length * 1e5 + 1).astype(np.int)
-        window_hap = Haplotype(matrix=window_mat, positions=scaled_positions.tolist())
+        window_pos = positions[i:i + window_size]
+        # length = window_pos[-1] - window_pos[0]
+        # reimplement here!!! scaled_positions seems to be useless
+        # scaled_positions = ((window_pos - window_pos[0]) / length * 1e5 + 1).astype(np.int)
+        window_hap = Haplotype(matrix=window_mat, positions=window_pos)
         windows.append(window_hap)
     return windows
 
@@ -70,13 +71,13 @@ def cut_replicate(replicate, window_size=50, drop_last=True):
         replicates.append(rep_fragment)
     if not drop_last:
         if count == 0:
-            ts_last = None
+            rep_last = None
         else:
             ts_last = ts.keep_intervals([[indices[-1], indices[-1]+count-1]])
             ts_last.__setattr__('rr', replicate.configs['recombination_rate'])
             ts_last.__setattr__('mr', replicate.configs['rate'])
             rep_last = Replicate(ts_last, replicate.configs)
-        return replicates, ts_last
+        return replicates, rep_last
     return replicates
 
 

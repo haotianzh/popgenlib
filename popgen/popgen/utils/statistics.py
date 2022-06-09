@@ -72,13 +72,13 @@ def stat(rates, pos, sequence_length, ne=1e5, window_size=50, step_size=50, bin_
     bounds = []
     for i in range(len(rates)):
         # take central point in each interval
-        centers.append(pos[int(i*window_size+ step_size/2)])
-        bounds.append((pos[i*window_size], pos[min(i*window_size+step_size, len(pos)-1)]))
-        if i*window_size + step_size >= snpsites:
+        centers.append(pos[int(i*step_size + window_size/2)])
+        bounds.append((pos[i*step_size], pos[min(i*step_size+window_size, len(pos)-1)]))
+        if i*step_size + window_size >= snpsites:
             last = len(rates)-1
         else:
-            last = i*window_size + step_size
-        lens.append(pos[last] - pos[i*window_size])
+            last = i*step_size + window_size
+        lens.append(pos[last] - pos[i*step_size])
     lens = np.array(lens)
     scaledY = rates / lens / 2 / ploidy / ne
     v, bin_edges, _ = scipy.stats.binned_statistic(centers, scaledY, bins=sequence_length//bin_width) # range=(0,chrLength)
